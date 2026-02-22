@@ -114,8 +114,8 @@ test('works with error with cause thrown outside tests', () => {
 });
 
 test('includes error causes in JSON failureMessages', () => {
-  // Stderr already has cause coverage in other tests; this assertion targets
-  // the structured JSON payload consumed by reporters.
+  // Stderr cause coverage is handled by snapshot tests above; this assertion
+  // targets the structured JSON payload consumed by reporters and integrations.
   const {json} = runJestJson(dir, ['errorWithCause.test.js']);
 
   const result = json.testResults[0];

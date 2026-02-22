@@ -43,4 +43,37 @@ describe('Jasmine2Reporter', () => {
       expect(secondResult.ancestorTitles[1]).toBe('child 2');
     });
   });
+
+  it('serializes Error.cause in failure messages', () => {
+    const nestedCause = new Error('error during g');
+    const error = new Error('error during f', {cause: nestedCause});
+    const spec = {
+      description: 'description',
+      failedExpectations: [
+        {
+          error,
+          matcherName: '',
+          message: error.message,
+          passed: false,
+          stack: error.stack,
+        },
+      ],
+      fullName: 'spec with cause',
+      id: '1',
+      status: 'failed',
+    } as any as SpecResult;
+
+    const extracted = (
+      reporter as unknown as {
+        _extractSpecResults: (
+          specResult: SpecResult,
+          ancestorTitles: Array<string>,
+        ) => {failureMessages: Array<string>};
+      }
+    )._extractSpecResults(spec, []);
+
+    expect(extracted.failureMessages[0]).toContain(
+      '[cause]: Error: error during g',
+    );
+  });
 });
